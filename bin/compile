@@ -1,31 +1,31 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-# sync output
-$stdout.sync = true
+set -e
 
-BUILD_DIR = ARGV[0]
-CACHE_DIR = ARGV[1]
-ARCHIVE_NAME = "freetds-0.95.20"
+export BUILD_DIR=$1
+export CACHE_DIR=$2
+export ARCHIVE_NAME="freetds-0.95.20"
 
-  puts "-----> Fetching & Extracting FreeTDS"
-  puts `mkdir -p #{CACHE_DIR}`
-  puts `curl http://j.brgh.net/#{ARCHIVE_NAME}.tar.gz -o - | tar -xz -C #{CACHE_DIR} -f -`
+echo BUILD_DIR is $BUILD_DIR
+echo CACHE_DIR is $CACHE_DIR
 
-  puts "-----> Configurating FreeTDS"
-  puts `mkdir -p #{BUILD_DIR}/vendor/freetds`
-  puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && ./configure --prefix=#{BUILD_DIR}/vendor/freetds --with-libiconv-prefix=DIR --with-openssl=DIR --with-tdsver=7.3`
+mkdir -p $CACHE_DIR
+mkdir -p $BUILD_DIR/vendor/freetds
 
-  puts "-----> Building FreeTDS"
-  puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && make`
+echo "-----> Writing FreeTDS configuration for subsequent buildpack"
+echo "export FREETDS_DIR=/app/vendor/freetds" >> export
 
-puts "-----> Installing FreeTDS into #{BUILD_DIR}/vendor/freetds"
-puts `mkdir -p #{BUILD_DIR}/vendor/freetds`
-puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && make install`
+echo "-----> Fetching & Extracting FreeTDS"
+curl http://j.brgh.net/$ARCHIVE_NAME.tar.gz -o - | tar -xz -C $CACHE_DIR -f -
 
-puts "-----> Copying FreeTDS into /app/vendor/freetds"
-puts `cp -r #{BUILD_DIR}/vendor/freetds /app/vendor/freetds`
+echo "-----> Configuring FreeTDS"
+cd $CACHE_DIR/$ARCHIVE_NAME && ./configure --prefix=$BUILD_DIR/vendor/freetds --with-libiconv-prefix=DIR --with-openssl=DIR --with-tdsver=7.3
 
-puts "-----> Writing FreeTDS configuration for subsequent buildpack"
-File.open("export", "w") do |file|
-  file.write("export FREETDS_DIR=/app/vendor/freetds")
-end
+echo "-----> Building FreeTDS"
+cd $CACHE_DIR/$ARCHIVE_NAME && make
+
+echo "-----> Installing FreeTDS into $BUILD_DIR/vendor/freetds"
+cd $CACHE_DIR/$ARCHIVE_NAME && make install
+
+echo "-----> Copying FreeTDS into /app/vendor/freetds"
+cp -r $BUILD_DIR/vendor/freetds /app/vendor/freetds
