@@ -5,7 +5,7 @@ $stdout.sync = true
 
 BUILD_DIR = ARGV[0]
 CACHE_DIR = ARGV[1]
-ARCHIVE_NAME = "freetds-0.95.19"
+ARCHIVE_NAME = "freetds-0.95.20"
 
   puts "-----> Fetching & Extracting FreeTDS"
   puts `mkdir -p #{CACHE_DIR}`
@@ -13,7 +13,7 @@ ARCHIVE_NAME = "freetds-0.95.19"
 
   puts "-----> Configurating FreeTDS"
   puts `mkdir -p #{BUILD_DIR}/vendor/freetds`
-  puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && ./configure --prefix=#{BUILD_DIR}/vendor/freetds`
+  puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && ./configure --prefix=#{BUILD_DIR}/vendor/freetds --with-libiconv-prefix=DIR --with-openssl=DIR --with-tdsver=7.3`
 
   puts "-----> Building FreeTDS"
   puts `cd #{CACHE_DIR}/#{ARCHIVE_NAME} && make`
