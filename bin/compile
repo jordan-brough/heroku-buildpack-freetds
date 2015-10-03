@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# fail the script if any commands fail
 set -e
 
 export BUILD_DIR=$1
